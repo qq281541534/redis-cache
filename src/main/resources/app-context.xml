@@ -33,7 +33,7 @@
 		<property name="minIdle" value="0" />
 		<property name="defaultAutoCommit" value="false" />
 	</bean>
-
+	<!-- hibernate -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -61,7 +61,7 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-
+	<!-- redis cache -->
 	<cache:annotation-driven />
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
@@ -84,7 +84,5 @@
 			</map>
 		</property>
 	</bean>
-
-
 
 </beans>
