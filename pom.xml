@@ -33,7 +33,7 @@
 			<artifactId>spring-orm</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -135,6 +135,12 @@
 			<version>3.15.0-GA</version>
 		</dependency>
 
+		<!-- 二进制 -->
+		<dependency>
+			<groupId>org.msgpack</groupId>
+			<artifactId>msgpack</artifactId>
+			<version>0.6.11</version>
+		</dependency>
 
 
 

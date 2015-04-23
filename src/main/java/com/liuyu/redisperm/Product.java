@@ -3,12 +3,15 @@ package com.liuyu.redisperm;
 import java.io.Serializable;
 import java.util.List;
 
+import org.msgpack.annotation.MessagePackBeans;
+
 /**
  * 商品
  * @author liuyu
  *
  * @since 2015年4月22日
  */
+@MessagePackBeans
 public class Product implements Serializable{
 
 	private static final long serialVersionUID = -5818433884770798578L;

@@ -7,21 +7,20 @@
     	http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
 
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig"/>
-	<bean id="jedisConnectionFactory"
-		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
-		destroy-method="destroy">
-		<property name="poolConfig" ref="jedisPoolConfig"></property>
-		<property name="hostName" value="127.0.0.1"></property>
-		<property name="port" value="6379"></property>
-		<property name="password" value=""></property>
-		<property name="timeout" value="15000"></property>
-		<property name="usePool" value="true"></property>
+	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy">
+		<property name="poolConfig" ref="jedisPoolConfig"/>
+		<property name="hostName" value="127.0.0.1"/>
+		<property name="port" value="6379"/>
+		<property name="password" value=""/>
+		<property name="timeout" value="15000"/>
+		<property name="usePool" value="true"/>
 	</bean>
+	<bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 	<bean id="jedisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-		<property name="connectionFactory" ref="jedisConnectionFactory"></property>
-		<property name="keySerializer">
-			<bean
-				class="org.springframework.data.redis.serializer.StringRedisSerializer" />
-		</property>
+		<property name="connectionFactory" ref="jedisConnectionFactory"/>
+		<property name="keySerializer" ref="stringRedisSerializer" />
+		<!-- <property name="valueSerializer" ref="stringRedisSerializer" /> -->
+		<property name="hashKeySerializer" ref="stringRedisSerializer" />
+    	<property name="hashValueSerializer" ref="stringRedisSerializer" />
 	</bean>
 </beans>

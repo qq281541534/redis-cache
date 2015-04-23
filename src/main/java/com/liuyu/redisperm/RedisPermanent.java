@@ -1,7 +1,9 @@
 package com.liuyu.redisperm;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.msgpack.MessagePack;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -24,11 +26,16 @@ public class RedisPermanent {
 		valueOper.set("product:" + product.getId(), product);
 	}
 
-	public void listOperationSample() {
+	public static void listOperationSample() throws IOException {
 		Product product = new Product(2, "iphone5");
-		ListOperations<String, Product> listOper = redisTemplate.opsForList();
-		listOper.leftPush("product:list", product);
-		listOper.rightPush("product:list", product);// rpush,tail
+		ListOperations<String, byte[]> listOper = redisTemplate.opsForList();
+		
+		//messagePack序列化
+		MessagePack mspack = new MessagePack();
+		byte[] data = mspack.write(product);
+		
+		listOper.leftPush("product:list", data);
+		listOper.rightPush("product:list", data);// rpush,tail
 	}
 
 	public void boundValueOperationSample() {
@@ -102,11 +109,12 @@ public class RedisPermanent {
 		redisTemplate.execute(sessionCallBack);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 				"app-redis.xml");
 		redisTemplate = context.getBean(RedisTemplate.class);
-		txProductPoolSample();
-		txCommentPoolSample();
+//		txProductPoolSample();
+//		txCommentPoolSample();
+		listOperationSample();
 	}
 }
