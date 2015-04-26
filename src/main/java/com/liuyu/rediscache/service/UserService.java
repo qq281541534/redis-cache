@@ -19,6 +19,7 @@ public class UserService {
 	@Autowired
 	private UserDao userDao;
 
+//	@CacheEvict(value = "user", key = "'all'")
 	@CachePut(value = "user", key = "#user.id")
 	public void addUser(User user) {
 		userDao.save(user);
@@ -29,16 +30,18 @@ public class UserService {
 		return userDao.findById(id, User.class);
 	}
 	
-	@Cacheable(value = "user", key = "'all'")
+//	@Cacheable(value = "user", key = "'all'")
 	public List<User> list() {
 		return userDao.list("from User");
 	}
 
-	@CacheEvict(value = "user", key="#user.id")
+//	@CacheEvict(value = "user", key="'all'")
+	@CachePut(value = "user", key = "#user.id")
 	public void updateUser(User user) {
 		userDao.update(user);
 	}
 
+//	@CacheEvict(value = "user", key = "'all'")
 	@CacheEvict(value = "user", key = "#id")
 	public String deleteUser(String id) {
 		User user = userDao.findById(id, User.class);

@@ -3,12 +3,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
-		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd">
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
 
 	<context:property-placeholder
 		ignore-resource-not-found="true" location="classpath*:config.properties" />
@@ -20,12 +21,9 @@
 	</context:component-scan>
 
 	<!-- 针对不同环境的配置 -->
-	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+	<bean id="parentDataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driver}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
 
 		<property name="initialSize" value="5" />
 		<property name="maxActive" value="${jdbc.maxActive}" />
@@ -33,6 +31,28 @@
 		<property name="minIdle" value="0" />
 		<property name="defaultAutoCommit" value="false" />
 	</bean>
+
+	<!-- 主数据源 -->
+	<bean id="writeDataSource" parent="parentDataSource">
+		<property name="url" value="${jdbc.write.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	<!-- 从数据源 -->
+	<bean id="readDataSource" parent="parentDataSource">
+		<property name="url" value="${jdbc.read.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	<bean id="dataSource" class="com.liuyu.rediscache.datasource.DynamicDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="read" value-ref="readDataSource" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="writeDataSource" />
+	</bean>
+
 	<!-- hibernate -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
@@ -51,6 +71,14 @@
 		<property name="packagesToScan" value="com.liuyu.rediscache.entity" />
 	</bean>
 
+	<!-- 切换数据源 -->
+	<bean id="dataSourceAdvice" class="com.liuyu.rediscache.aop.DataSourceAdvice" />
+	<aop:config>
+		<aop:advisor
+			pointcut="execution(* com.liuyu.rediscache.service..*Service.*(..))"
+			advice-ref="dataSourceAdvice" />
+	</aop:config>
+
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
@@ -63,6 +91,8 @@
 
 	<!-- redis cache -->
 	<cache:annotation-driven />
+	<bean id="stringSerializer"
+		class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
 		<property name="hostName" value="${redis.hostName}" />
@@ -72,7 +102,16 @@
 	</bean>
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="jedisConnectionFactory" />
+		<property name="keySerializer" ref="stringSerializer" />
+		<!-- <property name="valueSerializer" ref="stringSerializer" /> -->
 	</bean>
+
+	<!-- <bean id="jacksonRedisSerializer" class="org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer" 
+		> <constructor-arg ref="objectClazz"></constructor-arg> </bean> <bean id="objectClazz" 
+		class="java.lang.Class" factory-method="forName"> <constructor-arg value="java.lang.Object"></constructor-arg> 
+		</bean> -->
+
+
 	<bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
 		<property name="usePrefix" value="true" />
 		<constructor-arg name="template" ref="redisTemplate" />

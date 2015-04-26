@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 public class RedisPermanent {
 
@@ -28,14 +29,15 @@ public class RedisPermanent {
 
 	public static void listOperationSample() throws IOException {
 		Product product = new Product(2, "iphone5");
-		ListOperations<String, byte[]> listOper = redisTemplate.opsForList();
-		
+		ListOperations<String, Product> listOper = redisTemplate.opsForList();
+//		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Product>(Product.class));
 		//messagePack序列化
-		MessagePack mspack = new MessagePack();
-		byte[] data = mspack.write(product);
-		
-		listOper.leftPush("product:list", data);
-		listOper.rightPush("product:list", data);// rpush,tail
+//		MessagePack mspack = new MessagePack();
+//		byte[] data = mspack.write("abc");
+//		String data = JSONUtil.toJSON(product);
+//		System.out.println(data);
+		listOper.leftPush("product:list", product);
+//		listOper.rightPush("product:list", data);// rpush,tail
 	}
 
 	public void boundValueOperationSample() {
