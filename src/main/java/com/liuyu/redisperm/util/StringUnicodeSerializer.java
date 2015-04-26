@@ -1,4 +1,4 @@
-package com.liuyu.redisperm;
+package com.liuyu.redisperm.util;
 
 import java.io.IOException;
 

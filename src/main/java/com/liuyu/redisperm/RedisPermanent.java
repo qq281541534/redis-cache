@@ -16,6 +16,9 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+import com.liuyu.redisperm.entity.Comment;
+import com.liuyu.redisperm.entity.Product;
+
 public class RedisPermanent {
 
 	private static RedisTemplate redisTemplate;

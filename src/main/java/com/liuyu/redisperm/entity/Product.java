@@ -1,4 +1,4 @@
-package com.liuyu.redisperm;
+package com.liuyu.redisperm.entity;
 
 import java.io.Serializable;
 import java.util.List;
