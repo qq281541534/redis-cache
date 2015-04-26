@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.liuyu.rediscache.entity.User;
 import com.liuyu.rediscache.service.UserService;
@@ -25,6 +26,13 @@ public class UserController {
 		List<User> users = userService.list();
 		model.addAttribute("users", users);
 		return "list";
+	}
+	
+	@RequestMapping(value = "/json")
+	@ResponseBody
+	public String json(HttpServletRequest request, Model model) {
+		List<User> users = userService.list();
+		return users.toString();
 	}
 	
 	@RequestMapping("/details")
@@ -44,7 +52,7 @@ public class UserController {
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public String save(HttpServletRequest request, User user) {
-		if(user != null && user.getId() != null){
+		if(user != null && !"".equals(user.getId())){
 			userService.updateUser(user);
 		} else {
 			userService.addUser(user);
