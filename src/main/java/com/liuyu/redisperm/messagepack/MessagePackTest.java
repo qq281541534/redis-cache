@@ -10,7 +10,11 @@ import org.msgpack.type.Value;
 import org.msgpack.unpacker.Converter;
 
 
-
+/**
+ * 序列化msgPack
+ * @author liuyu
+ *
+ */
 public class MessagePackTest {
 
 	public static void main(String[] args) throws IOException {
