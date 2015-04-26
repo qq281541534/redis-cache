@@ -91,8 +91,7 @@
 
 	<!-- redis cache -->
 	<cache:annotation-driven />
-	<bean id="stringSerializer"
-		class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	
 	<bean id="jedisConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
 		<property name="hostName" value="${redis.hostName}" />
@@ -103,13 +102,17 @@
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 		<property name="connectionFactory" ref="jedisConnectionFactory" />
 		<property name="keySerializer" ref="stringSerializer" />
-		<!-- <property name="valueSerializer" ref="stringSerializer" /> -->
+		<property name="valueSerializer" ref="jacksonRedisSerializer" />
 	</bean>
 
-	<!-- <bean id="jacksonRedisSerializer" class="org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer" 
-		> <constructor-arg ref="objectClazz"></constructor-arg> </bean> <bean id="objectClazz" 
-		class="java.lang.Class" factory-method="forName"> <constructor-arg value="java.lang.Object"></constructor-arg> 
-		</bean> -->
+	<!-- 序列化方式 -->
+	<bean id="stringSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	<bean id="jacksonRedisSerializer" class="org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer"> 
+		<constructor-arg ref="objectClazz"/> 
+	</bean> 
+	<bean id="objectClazz" class="java.lang.Class" factory-method="forName"> 
+		<constructor-arg value="java.lang.Object"/> 
+	</bean>
 
 
 	<bean id="cacheManager" class="org.springframework.data.redis.cache.RedisCacheManager">
