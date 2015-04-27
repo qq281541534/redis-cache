@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import org.msgpack.annotation.MessagePackBeans;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 
 /**
  * 评论
