@@ -3,6 +3,15 @@ package com.liuyu.redisperm.util;
 public class GlobalSchema {
 
 	/**
+	 * 获取文章浏览数键
+	 * @param articleId
+	 * @return
+	 */
+	public static final String getArticleBrowseNumKey(String articleId){
+		return String.format("article:%s:browsenum", articleId);
+	}
+	
+	/**
 	 *  获取文章评论键
 	 * @param articleId
 	 * @param commentId
@@ -39,4 +48,5 @@ public class GlobalSchema {
 	public static final String getCommentByUsernameKey(String username){
 		return String.format("comment:username:%s", username);
 	}
+	
 }

@@ -28,4 +28,9 @@
 	<bean id="objectClazz" class="java.lang.Class" factory-method="forName">
 		<constructor-arg value="java.lang.Object"></constructor-arg>
 	</bean> -->
+	<!-- 原子操作 -->
+	<!-- <bean id="redisAtomicLong" class="org.springframework.data.redis.support.atomic.RedisAtomicLong">
+		<constructor-arg name="redisCounter" value="counter"/>
+		<constructor-arg name="factory" value="jedisConnectionFactory"/>
+	</bean> -->
 </beans>

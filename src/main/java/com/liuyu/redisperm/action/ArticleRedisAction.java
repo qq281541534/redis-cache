@@ -2,9 +2,8 @@ package com.liuyu.redisperm.action;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
@@ -13,7 +12,10 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 
 import com.liuyu.redisperm.entity.Comment;
 import com.liuyu.redisperm.util.GlobalSchema;
@@ -27,8 +29,10 @@ import com.liuyu.redisperm.util.RedisPagingFactory.RedisPageHelper;
  */
 public class ArticleRedisAction {
 
+	private static RedisTemplate<String, Long> redisTemplate1;
 	private static RedisTemplate redisTemplate;
 	private static RedisPagingFactory redisPag = new RedisPagingFactory();
+	private static RedisAtomicLong redisAtomiclong;
 	
 	/**
 	 * 保存文章评论
@@ -50,6 +54,7 @@ public class ArticleRedisAction {
 				//用户评论key集
 				String commentUsernameKey = GlobalSchema.getCommentByUsernameKey(comment.getUsername());
 
+				
 				//文章的评论使用set
 				@SuppressWarnings("unchecked")
 				SetOperations<String, Comment> setOper = (SetOperations<String, Comment>) operations.opsForSet();
@@ -74,6 +79,20 @@ public class ArticleRedisAction {
 				return null;
 			}
 		});
+	}
+	
+	/**
+	 * 初始化文章浏览数
+	 * @param articleId
+	 */
+	public static void saveArticBrowseNum(final String articleId){
+		redisTemplate1.setValueSerializer(new GenericToStringSerializer<Long>(Long.class));
+		
+		//文章浏览数Key
+		String articleBrowseNumKey = GlobalSchema.getArticleBrowseNumKey(articleId);
+		//文章的浏览数使用String
+		ValueOperations valueOper = redisTemplate1.opsForValue();
+		valueOper.set(articleBrowseNumKey, 0l);
 	}
 	
 	/**
@@ -142,32 +161,34 @@ public class ArticleRedisAction {
 		return comment;
 	}
 	
+	/**
+	 * 获取文章浏览数
+	 * @param key
+	 * @return
+	 */
+	public static Long getArticleBrowesNumByKey(String key){
+		ValueOperations<String, Long> valueOper = redisTemplate1.opsForValue();
+		Long browesNum = valueOper.increment(key, 1l);
+		return browesNum;
+	}
+	
 	public static void main(String[] args) throws IOException {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 				"app-redis.xml");
-		//添加评论
-//		redisTemplate = context.getBean(RedisTemplate.class);
-//		
-//		for(int i=0;i<10;i++){
-//			Comment comment = new Comment();
-//			comment.setId(i+"");
-//			comment.setContent("I have a dream_" + i);
-//			comment.setProductId("1");
-//			comment.setUsername("17090020140");
-//			comment.setPraise(32-i);
-//			saveArticleComment(comment);
-//			
-//		}
-//		Comment comment1 = new Comment();
-//		comment1.setId("2");
-//		comment1.setContent("this is a dream");
-//		comment1.setProductId("1");
-//		comment1.setUsername("17090020140");
-//		comment1.setPraise(42);
-//		saveArticleComment(comment1);
-		
+		redisTemplate1 = context.getBean(RedisTemplate.class);
 		redisTemplate = context.getBean(RedisTemplate.class);
-//		
+		
+		//添加评论
+		for(int i=0;i<10;i++){
+			Comment comment = new Comment();
+			comment.setId(UUID.randomUUID().toString());
+			comment.setContent("I have a dream_" + i);
+			comment.setProductId("1");
+			comment.setUsername("17090020140");
+			comment.setPraise(32-i);
+			saveArticleComment(comment);
+		}
+		
 //		String articleId = "1";
 //		//通过赞排序分页获取文章评论
 //		RedisPageHelper<String> redisPageHelper = getPageForArticleCommentIdsByPraise("1", 1l);
@@ -184,15 +205,19 @@ public class ArticleRedisAction {
 //		System.out.println(comments);
 		
 		//通过用户名分页获取评论
-		RedisPageHelper<String> redisPageHelperByUsername = getPageForCommentByUsername("17090020140");
-		List<String> keys = redisPageHelperByUsername.getData();
-		List<Comment> comments = new LinkedList<Comment>();
-		for(int i = 0; i < keys.size(); i ++){
-			String key = keys.get(i);
-			Comment comment = getCommentByKey(key);
-			comments.add(comment);
-		}
-		System.out.println(comments.get(0));
+//		RedisPageHelper<String> redisPageHelperByUsername = getPageForCommentByUsername("17090020140");
+//		List<String> keys = redisPageHelperByUsername.getData();
+//		List<Comment> comments = new LinkedList<Comment>();
+//		for(int i = 0; i < keys.size(); i ++){
+//			String key = keys.get(i);
+//			Comment comment = getCommentByKey(key);
+//			comments.add(comment);
+//		}
+//		System.out.println(comments.get(0));
 		
+		//初始化文章浏览数
+//		saveArticBrowseNum("1");
+		//浏览数，每次加一
+//		System.out.println(getArticleBrowesNumByKey("article:1:browsenum"));
 	}
 }
