@@ -1,9 +1,8 @@
-package com.liuyu.redisperm;
+package com.liuyu.redisperm.action;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.msgpack.MessagePack;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.BoundValueOperations;
@@ -14,18 +13,16 @@ import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 import com.liuyu.redisperm.entity.Comment;
 import com.liuyu.redisperm.entity.Product;
 
-public class RedisPermanent {
+public class ProductAction {
 
-	private static RedisTemplate redisTemplate;
+	private static RedisTemplate<String, Product> redisTemplate;
 
 	public void valueOperationSample() {
-		ValueOperations<String, Product> valueOper = redisTemplate
-				.opsForValue();
+		ValueOperations<String, Product> valueOper = redisTemplate.opsForValue();
 		Product product = new Product(1, "iphone6");
 		valueOper.set("product:" + product.getId(), product);
 	}
@@ -73,15 +70,14 @@ public class RedisPermanent {
 					throws DataAccessException {
 				operations.multi();
 				Product product = new Product(1, "iphone6");
-				String productKey = "product:" + product.getId();
+				String productKey = String.format("product:%d", product.getId());
 				String productScoresKey = "product:scores";
-				SetOperations<String, Product> setOper = (SetOperations<String, Product>) operations
-						.opsForSet();
+				@SuppressWarnings("unchecked")
+				SetOperations<String, Product> setOper = (SetOperations<String, Product>) operations.opsForSet();
 				setOper.add(productKey, product);
-				ZSetOperations<String, Integer> zsetOper = (ZSetOperations<String, Integer>) operations
-						.opsForZSet();
-				zsetOper.add(productScoresKey, product.getId(),
-						System.currentTimeMillis());
+				@SuppressWarnings("unchecked")
+				ZSetOperations<String, Integer> zsetOper = (ZSetOperations<String, Integer>) operations.opsForZSet();
+				zsetOper.add(productScoresKey, product.getId(), System.currentTimeMillis());
 				operations.exec();
 				return product;
 			}
@@ -95,16 +91,14 @@ public class RedisPermanent {
 			public <K, V> Comment execute(RedisOperations<K, V> operations)
 					throws DataAccessException {
 				operations.multi();
-				Comment comment = new Comment(1, "good", 1, 3);
-				String productCommentKey = "product:" + 1 + ":comment:"
-						+ comment.getId();
-				String productCommentScoreKey = "product:" + 1
-						+ ":comment:scores";
-				SetOperations<String, Comment> setOper = (SetOperations<String, Comment>) operations
-						.opsForSet();
+				Comment comment = new Comment("1", "good", "ly", "1", 32);
+				String productCommentKey = String.format("product:%d:comment:%d", 1, comment.getId());
+				String productCommentScoreKey = String.format("product:%d:comment:scores",	1);
+				@SuppressWarnings("unchecked")
+				SetOperations<String, Comment> setOper = (SetOperations<String, Comment>) operations.opsForSet();
 				setOper.add(productCommentKey, comment);
-				ZSetOperations<String, Integer> zsetOper = (ZSetOperations<String, Integer>) operations
-						.opsForZSet();
+				@SuppressWarnings("unchecked")
+				ZSetOperations<String, Integer> zsetOper = (ZSetOperations<String, Integer>) operations.opsForZSet();
 				zsetOper.add(productCommentScoreKey, 1,
 						System.currentTimeMillis());
 				operations.exec();
