@@ -11,7 +11,7 @@ import org.msgpack.annotation.MessagePackBeans;
  *
  * @since 2015年4月22日
  */
-@MessagePackBeans
+//@MessagePackBeans
 public class Comment implements Serializable{
 
 	private static final long serialVersionUID = 6568310863644187637L;

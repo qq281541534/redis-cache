@@ -21,8 +21,8 @@
 		<property name="keySerializer" ref="stringRedisSerializer" />
 	</bean>
 	
-	<!-- <bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
-	<bean id="jackson" class="org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer" >
+	<bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	<!-- <bean id="jackson" class="org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer" >
 		<constructor-arg ref="objectClazz"></constructor-arg>
 	</bean>
 	<bean id="objectClazz" class="java.lang.Class" factory-method="forName">

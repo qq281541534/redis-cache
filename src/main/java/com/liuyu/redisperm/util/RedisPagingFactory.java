@@ -159,7 +159,7 @@ public class RedisPagingFactory {
 	}
 	
 	/**	默认分页大小 */
-	private static final int DEFAULT_PAGE_SIZE = 10;
+	private static final int DEFAULT_PAGE_SIZE = 5;
 	
 	/** 分页大小 */
 	private int pageSize;

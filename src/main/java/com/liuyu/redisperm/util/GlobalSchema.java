@@ -9,8 +9,8 @@ public class GlobalSchema {
 	 * @param username
 	 * @return
 	 */
-	public static final String getArticleCommentUsernameKey(String articleId, String commentId, String username){
-		return String.format("article:%s:comment:%s:username:%s", articleId, commentId, username);
+	public static final String getArticleCommentKey(String articleId, String commentId){
+		return String.format("article:%s:comment:%s", articleId, commentId);
 	}
 	
 	/**
@@ -29,5 +29,14 @@ public class GlobalSchema {
 	 */
 	public static final String getArticleCommentByPraiseKey(String articleId){
 		return String.format("article:%s:comment:praise", articleId);
+	}
+	
+	/**
+	 * 获取用户的所有评论键
+	 * @param username
+	 * @return
+	 */
+	public static final String getCommentByUsernameKey(String username){
+		return String.format("comment:username:%s", username);
 	}
 }
