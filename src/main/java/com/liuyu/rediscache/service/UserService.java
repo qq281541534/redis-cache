@@ -32,7 +32,7 @@ public class UserService {
 	 * @param user
 	 */
 //	@CacheEvict(value = "user", key = "'all'")
-	@CachePut(value = "user", key = "#user.id")
+//	@CachePut(value = "user", key = "#user.id")
 	public void addUser(User user) {
 		userDao.save(user);
 	}
@@ -57,7 +57,7 @@ public class UserService {
 	 * @param user
 	 */
 //	@CacheEvict(value = "user", key="'all'")
-	@CachePut(value = "user", key = "#user.id")
+	@CacheEvict(value = "user", key = "#user.id")
 	public void updateUser(User user) {
 		userDao.update(user);
 	}
